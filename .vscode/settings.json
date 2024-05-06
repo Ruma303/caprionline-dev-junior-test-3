@@ -1,0 +1,40 @@
+{
+    "restoreTerminals.runOnStartup": true,
+    "restoreTerminals.terminals": [
+        {
+            "splitTerminals": [
+                {
+                    "shouldRunCommands": true,
+                    "name": "frontend",
+                    "commands": [
+                        "cd frontend",
+                        "docker compose up -d",
+                        "./scripts/shell.sh",
+                        "npm install",
+                        "npm run dev",
+                    ]
+                },
+                {
+                    "shouldRunCommands": true,
+                    "name": "backend",
+                    "commands": [
+                        "cd backend",
+                        "docker compose up -d",
+                        "./scripts/shell.sh",
+                        "composer install",
+                        "./scripts/db_init.sh",
+                        "symfony server:start -d",
+                    ]
+                }
+            ]
+        },
+        {
+            "splitTerminals": [
+                {
+                    "shouldRunCommands": true,
+                    "name": "Terminal",
+                },
+            ]
+        }
+    ]
+}
