@@ -4,53 +4,54 @@ import Filters from './partials/Filters';
 
 const App = () => {
     const [loading, setLoading] = useState(true);
-  const [movies, setMovies] = useState([]);
-  const [sortedMovies, setSortedMovies] = useState([]);
-  const [selectedGenre, setSelectedGenre] = useState('all');
+    const [movies, setMovies] = useState([]);
+    const [sortedMovies, setSortedMovies] = useState([]);
+    const [selectedGenres, setSelectedGenres] = useState('all');
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
+    useEffect(() => {
+        fetchMovies();
+    }, []);
 
-  const fetchMovies = () => {
-    setLoading(true);
-    fetch('http://localhost:8000/movies')
-      .then(response => response.json())
-      .then(data => {
-        setMovies(data);
-        filterMovies(data);
-        setLoading(false);
-      });
-  };
+    const fetchMovies = () => {
+        setLoading(true);
+        fetch('http://localhost:8000/movies')
+            .then(response => response.json())
+            .then(data => {
+                setMovies(data);
+                filterMovies(data);
+                setLoading(false);
+            });
+    };
 
-  const filterMovies = (movies) => {
-    let filtered = movies;
-    if (selectedGenre !== 'all') {
-      filtered = movies.filter(movie => movie.genre === selectedGenre);
-    }
-    setSortedMovies(filtered);
-  };
+    const filterMovies = (movies) => {
+        if (selectedGenres === 'all') {
+            setSortedMovies(movies);
+        } else {
+            const filtered = movies.filter(movie => movie.genres.includes(selectedGenres));
+            setSortedMovies(filtered);
+        }
+    };
 
-  const handleGenreChange = (genre) => {
-    setSelectedGenre(genre);
-    filterMovies(movies);
-  };
+    const handleGenreChange = (genres) => {
+        setSelectedGenres(genres);
+        filterMovies(movies);
+    };
 
-  const sortByNewest = () => {
-    const sorted = [...movies].sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
-    setSortedMovies(sorted);
-  };
+    const sortByNewest = () => {
+        const sorted = [...movies].sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+        setSortedMovies(sorted);
+    };
 
-  const sortByRating = () => {
-    const sorted = [...movies].sort((a, b) => b.rating - a.rating);
-    setSortedMovies(sorted);
-  };
+    const sortByRating = () => {
+        const sorted = [...movies].sort((a, b) => b.rating - a.rating);
+        setSortedMovies(sorted);
+    };
 
     return (
         <Layout>
             <Heading />
+            <Filters onNewest={sortByNewest} onRating={sortByRating} onGenreChange={handleGenreChange} />
             <MovieList loading={loading}>
-                <Filters onNewest={sortByNewest} onRating={sortByRating} onGenreChange={handleGenreChange} />
                 {sortedMovies.map((item, key) => (
                     <MovieItem key={key} {...item} />
                 ))}

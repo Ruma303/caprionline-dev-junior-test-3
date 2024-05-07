@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Table('movies')]
 class Movie
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -198,7 +199,6 @@ class Movie
     public function removeMovieGenre(MovieGenre $movieGenre): static
     {
         if ($this->movieGenres->removeElement($movieGenre)) {
-            // set the owning side to null (unless already changed)
             if ($movieGenre->getMovie() === $this) {
                 $movieGenre->setMovie(null);
             }
@@ -228,7 +228,6 @@ class Movie
     public function removeMovieActor(MovieActor $movieActor): static
     {
         if ($this->movieActors->removeElement($movieActor)) {
-            // set the owning side to null (unless already changed)
             if ($movieActor->getMovie() === $this) {
                 $movieActor->setMovie(null);
             }
@@ -258,12 +257,21 @@ class Movie
     public function removeMovieKeyword(MovieKeyword $movieKeyword): static
     {
         if ($this->movieKeywords->removeElement($movieKeyword)) {
-            // set the owning side to null (unless already changed)
             if ($movieKeyword->getMovie() === $this) {
                 $movieKeyword->setMovie(null);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @Groups({"default"})
+     */
+    public function getGenresNames(): array
+    {
+        return $this->movieGenres->map(function (MovieGenre $mg) {
+            return $mg->getGenre()->getName();
+        })->toArray();
     }
 }

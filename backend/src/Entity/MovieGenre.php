@@ -2,13 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\MovieGenreRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MovieGenreRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MovieGenreRepository::class)]
 #[ORM\Table('movies_genres')]
 class MovieGenre
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,6 +20,7 @@ class MovieGenre
     private ?Movie $movie = null;
 
     #[ORM\ManyToOne]
+    #[Groups(["default"])]
     private ?Genre $genre = null;
 
     public function getId(): ?int

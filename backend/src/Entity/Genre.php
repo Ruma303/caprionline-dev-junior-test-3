@@ -2,19 +2,24 @@
 
 namespace App\Entity;
 
-use App\Repository\GenreRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\GenreRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GenreRepository::class)]
 #[ORM\Table('genres')]
 class Genre
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    /**
+     * @Groups("movie")
+     */
+    #[ORM\Column(type: "string", length: 255)]
     private ?string $name = null;
 
     public function getId(): ?int
