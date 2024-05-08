@@ -265,9 +265,7 @@ class Movie
         return $this;
     }
 
-    /**
-     * @Groups({"default"})
-     */
+    #[Groups(['default'])]
     public function getGenresNames(): array
     {
         return $this->movieGenres->map(function (MovieGenre $mg) {
