@@ -7,10 +7,19 @@ const App = () => {
     const [movies, setMovies] = useState([]);
     const [sortedMovies, setSortedMovies] = useState([]);
     const [selectedGenres, setSelectedGenres] = useState('all');
+    const [genres, setGenres] = useState([]);
 
     useEffect(() => {
         fetchMovies();
     }, []);
+
+    useEffect(() => {
+        filterMovies(movies);
+    }, [selectedGenres, movies]);
+
+    useEffect(() => {
+        sortByReleaseDate();
+    }, [movies]);
 
     const fetchMovies = () => {
         setLoading(true);
@@ -18,47 +27,68 @@ const App = () => {
             .then(response => response.json())
             .then(data => {
                 setMovies(data);
+                extractGenres(data);
                 filterMovies(data);
                 setLoading(false);
             });
+    };
+
+    const sortByReleaseDate = () => {
+        const sorted = [...movies].sort((a, b) => {
+            return new Date(b.releaseDate) - new Date(a.releaseDate);
+        });
+        setSortedMovies(sorted);
+    };
+
+    const sortRating = () => {
+        const sorted = [...movies].sort((a, b) => {
+            return b.rating - a.rating;
+        });
+        setSortedMovies(sorted);
+    }
+
+    const extractGenres = (movies) => {
+        const allGenres = new Set();
+        movies.forEach(movie => {
+            movie.genresNames.forEach(genre => {
+                allGenres.add(genre);
+            });
+        });
+        setGenres([...allGenres]);
     };
 
     const filterMovies = (movies) => {
         if (selectedGenres === 'all') {
             setSortedMovies(movies);
         } else {
-            const filtered = movies.filter(movie => movie.genres.includes(selectedGenres));
+            const filtered = movies.filter(movie => movie.genresNames.includes(selectedGenres));
             setSortedMovies(filtered);
         }
     };
 
-    const handleGenreChange = (genres) => {
-        setSelectedGenres(genres);
+    const handleGenreChange = (genre) => {
+        setSelectedGenres(genre);
         filterMovies(movies);
-    };
-
-    const sortByNewest = () => {
-        const sorted = [...movies].sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
-        setSortedMovies(sorted);
-    };
-
-    const sortByRating = () => {
-        const sorted = [...movies].sort((a, b) => b.rating - a.rating);
-        setSortedMovies(sorted);
     };
 
     return (
         <Layout>
             <Heading />
-            <Filters onNewest={sortByNewest} onRating={sortByRating} onGenreChange={handleGenreChange} />
+            <Filters
+                onGenreChange={handleGenreChange}
+                onNewest={sortByReleaseDate}
+                onRating={sortRating}
+                genres={genres}
+            />
             <MovieList loading={loading}>
-                {sortedMovies.map((item, key) => (
-                    <MovieItem key={key} {...item} />
+                {sortedMovies.map((item) => (
+                    <MovieItem key={item.id} {...item} />
                 ))}
             </MovieList>
         </Layout>
     );
 };
+
 
 const Layout = props => {
     return (
